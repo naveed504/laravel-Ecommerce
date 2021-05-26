@@ -11,6 +11,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UserAccountController;
+use App\Http\Middleware\AdminLogin;
+use App\Http\Middleware\UserAuth;
+use App\Http\Middleware\CustomerAuth;
 
 
 /*
@@ -24,8 +27,7 @@ use App\Http\Controllers\UserAccountController;
 |
 */
 
-
-
+Route::middleware([adminlogin::class])->group(function(){
 //Route for admin TO Manage Products and its Attribtes
 Route::get('admin', [ProductController::class, 'index']);
 Route::get('addproduct-form', [ProductController::class, 'addproductform']);
@@ -40,8 +42,6 @@ Route::post('updateattributes/{id}', [ProductController::class,'updateAttributes
 Route::get('addimages/{id}',[ProductController::class,'addImages']);
 Route::post('saveMultipleimages',[ProductController::class, 'saveMultipleimages']);
 Route::get('delete-alt-image/{id}',[ProductController::class,'deleteImages']);
-
-
 //Route for admin TO Manage Categories and its Attribtes
 Route::get('addcategory-form',[CategoryController::class, 'addcategoryform']);
 Route::post('savecategory',[CategoryController::class, 'savecategory']);
@@ -50,41 +50,32 @@ Route::get('edit-category/{id}',[CategoryController::class,'editcategory']);
 Route::post('updatecategory/{id}',[CategoryController::class,'updatecategory']);
 Route::get('delete-category/{id}',[CategoryController::class,'deletecategory']);
 Route::post('categoriesstatus',[CategoryController::class,'categoriesstatus']);
-
 //Route for admin TO Manage Banners
 Route::get('banner',[BannerController::class,'banner']);
 Route::get('showbanners',[BannerController::class,'showbanner']);
 Route::post('savebanner',[BannerController::class,'savebanner']);
-
-
-
 //Route for admin To Manage Coupons
 Route::get('add-coupon',[CouponController::class,'coupon']);
 Route::post('save-coupon',[CouponController::class,'saveCoupon']);
 Route::get('view-coupon',[CouponController::class, 'viewCoupon']);
 Route::post('couponstatus',[CouponController::class, 'couponstatus']);
 Route::get('delete-coupon/{id}',[CouponController::class, 'deletecoupon']);
-
-
-
 //Route for Admin to Manage Orders
 Route::get('view-orders',[ProductController::class, 'viewuserOrders']);
 Route::get('order-detail/{id}',[ProductController::class,'orderDetails']);
 Route::post('update-order-status',[ProductController::class,'updateOrderStatus']);
+});
 
 
-//Route for Frontend
-Route::get('/',[IndexController::class,'index']);
-Route::get('product-deail/{id}',[ProductController::class, 'productDetail']);
-Route::get('categories/{subcat}',[IndexController::class,'displaySubCategory']);
-Route::get('getproductprice',[IndexController::class,'getPrice']);
 
+
+
+Route::middleware([userauth::class])->group(function(){
 //Route for Cart
 Route::post('add-cart',[ProductController::class, 'addToCart']);
 Route::get('/cart',[ProductController::class, 'cart']);
 Route::get('cart/delete-product/{id}',[ProductController::class, 'deleteCartProduct']);
 Route::get('cart/update-quantity/{id}/{qnty}',[ProductController::class, 'updateCartProduct']);
-
 //Route for Apply Coupons
 Route::post('cart/apply-coupon',[ProductController::class,'applycoupon']);
 //Route for checkout
@@ -98,13 +89,26 @@ Route::get('orders/{id}',[ProductController::class, 'userOrderDetails']);
 //stripe payment integration
 Route::get('stripe',[ProductController::class, 'stripe']);
 Route::post('pay-stripe',[ProductController::class, 'paystripe']);
+//Route for UserAccount
+Route::get('account',[UserAccountController::class, 'account']);
+Route::get('change-password',[UserAccountController::class, 'changepassword']);
+Route::post('savechangepassword',[UserAccountController::class, 'savechangepassword']);
+Route::get('change-address',[UserAccountController::class, 'changeaddress']);
+Route::post('save-change-address',[UserAccountController::class, 'saveChangeAddress']);
+
+//Route For Forgot Password
+Route::post('recover-forgot-password',[ForgotPasswordController::class, 'recoverpassword']);
+Route::get('reset-password/{token}',[ResetPasswordController::class, 'resetpassword']);
+Route::post('reset-new-password', [ResetPasswordController::class, 'updatePassword']);
+});
 
 
 
-
-
-
-
+//Route for Frontend
+Route::get('/',[IndexController::class,'index']);
+Route::get('product-deail/{id}',[ProductController::class, 'productDetail']);
+Route::get('categories/{subcat}',[IndexController::class,'displaySubCategory']);
+Route::get('getproductprice',[IndexController::class,'getPrice']);
 
 
 
@@ -115,20 +119,11 @@ Route::post('user-register', [RegisterController::class ,'userRegister']);
 //Route for Login
 Route::post('loginuser', [LoginController::class ,'authenticate']);
 Route::get('logout', [LoginController::class, 'logout']);
-//Route For Forgot Password
 Route::get('forgot-password',[ForgotPasswordController::class, 'forgot']);
-Route::post('recover-forgot-password',[ForgotPasswordController::class, 'recoverpassword']);
-Route::get('reset-password/{token}',[ResetPasswordController::class, 'resetpassword']);
-Route::post('reset-new-password', [ResetPasswordController::class, 'updatePassword']);
 
 
 
-//Route for UserAccount
-Route::get('account',[UserAccountController::class, 'account']);
-Route::get('change-password',[UserAccountController::class, 'changepassword']);
-Route::post('savechangepassword',[UserAccountController::class, 'savechangepassword']);
-Route::get('change-address',[UserAccountController::class, 'changeaddress']);
-Route::post('save-change-address',[UserAccountController::class, 'saveChangeAddress']);
+
 
 
 

@@ -61,6 +61,7 @@
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane fade show active" id="grid-view">
                                     <div class="row">
+                                        @if(count($products))
                                         @foreach($products as $product)
                                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
                                             <div class="products-single fix">
@@ -85,6 +86,10 @@
                                             </div>
                                         </div>
                                         @endforeach
+                                        @else
+                                        <h3 style="margin-left:30px;"><b>Product Category is Empty</b></h4>
+                                        @endif
+
 
                                     </div>
                                 </div>

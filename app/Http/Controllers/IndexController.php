@@ -13,7 +13,7 @@ class IndexController extends Controller
     public function index(){
         $banners = Banner::where('status','1')->orderby('sort_order','asc')->get();
         $categories = Category::with('categories')->where(['parent_id'=>0])->get();
-        $products = ProductModel::all(  nnz);
+        $products = ProductModel::with('categories')->paginate(6);
         return view('wayshop.index')->with(compact('banners','categories','products'));
     }
 

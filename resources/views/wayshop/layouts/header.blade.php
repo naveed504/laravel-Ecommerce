@@ -46,14 +46,21 @@
                 </div>
                 <div class="our-link">
                     <ul>
-                        <li><a href=""><i class="fa fa-cart-plus"></i> Cart</a></li>
-                        @if(empty(Auth::check()))
 
 
-                        <li><a href="{{url('register')}}"><i class="fa fa-lock"></i> Login</a></li>
-                         @else
+
+
+
+                        @if(Auth::check() && Auth::user()->admin == 0)
                         <li><a href="{{url('account')}}"><i class="fa fa-user"></i> Account</a></li>
                         <li><a href="{{url('logout')}}"><i class="fa fa-lock"></i> Logout</a></li>
+                        <li><a href=""><i class="fa fa-cart-plus"></i> Cart( {{Session::get('countcartproduct')}} )</a></li>
+                        @else
+                        @if(Auth::check() && Auth::user()->admin == 1)
+                        <li><a href="{{url('admin')}}"><i class="fa fa-lock"></i> Admin Account</a></li>
+@endif
+
+                        <li @if(Auth::check() && Auth::user()->admin == 1) style="display:none" @endif><a href="{{url('register')}}"><i class="fa fa-lock" ></i> Login</a></li>
                         @endif
 
 

@@ -128,7 +128,6 @@ function stripeTokenHandler(token) {
 
 <?php
 
-Session::forget('order_id');
-Session::forget('grand_total');
+
 
 ?>

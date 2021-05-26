@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use RealRashid\SweetAlert\Facades\Alert;
-
+use App\Mail\OrderDetailMail;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
 use App\Models\ProductModel;
@@ -194,6 +194,7 @@ class ProductController extends Controller
     {
         $user_email=auth()->user()->email;
         Session::forget('CouponAmount');
+        Session::forget('countcartproduct');
         Session::forget('CouponCode');
        $data= $request->all();
        $session_id=Session::get('session_id');
@@ -202,13 +203,21 @@ class ProductController extends Controller
            Session::put('session_id',$session_id);
        }
 
+
+
         if(empty($user_email)){
             $data['user_email'] = '';
         }else{
             $data['user_email']= $user_email;
         }
+        if(empty($data['size'])){
+        Alert::warning('Select Size', 'Please select Product Size');
+        return redirect()->back();
+        }
 
         $sizeArr= explode('-',$data['size']);
+
+
 
        $productCount=Cart::where(['product_id'=>$data['product_id']])
             ->where(['product_color'=>$data['product_color']])
@@ -234,6 +243,10 @@ class ProductController extends Controller
                 $cart->user_email = $data['user_email'];
                 $cart->session_id = $session_id;
                 $cart->save();
+                $totalproductsincart= Cart::where('user_email',Auth::user()->email)->count();
+               Session::put('countcartproduct',$totalproductsincart);
+
+
                 return redirect('/cart')->with('alert-success','Product has been added in cart');
             }
 
@@ -253,10 +266,13 @@ class ProductController extends Controller
     }
 
     public function deleteCartProduct($id){
+        Session::forget('countcartproduct');
         Session::forget('CouponAmount');
         Session::forget('CouponCode');
         $id=Cart::where('id',$id);
         $id->delete();
+        $totalproductsincart= Cart::where('user_email',Auth::user()->email)->count();
+        Session::put('countcartproduct',$totalproductsincart);
         Alert::success('Deleted Successfully', 'Record Delete Successfully');
         return redirect()->back();
     }
@@ -420,6 +436,7 @@ class ProductController extends Controller
         $order->payment_method = $data['payment_method'];
         $order->grand_total = $data['grand_total'];
         $order->Save();
+
         $order_id=$order->id;
         $cartproducts=Cart::where(['user_email'=>$user_email])->get();
         foreach($cartproducts as $pro){
@@ -485,8 +502,30 @@ class ProductController extends Controller
               'description' => $request->input('name'),
               'source' => $token,
             ]);
-        //    dd($charge);
-            return redirect()->back()->with('flash_message_success','Your Payment Successfully Done!');
+$userid=Auth::user()->id;
+$orderdetail=Order::with('orders')->where('user_id',$userid)->orderBy('id','desc')->first();
+$details= [
+
+    'name'=> $orderdetail['name'],
+    'city'=> $orderdetail['city'],
+    'address'=> $orderdetail['address'],
+    'country'=> $orderdetail['country'],
+    'mobile'=> $orderdetail['mobile'],
+    'shipping_charges'=> $orderdetail['shipping_charges'],
+    'order_status'=> $orderdetail['order_status'],
+    'payment_method'=> $orderdetail['payment_method'],
+    'grand_total'=> $orderdetail['grand_total'],
+    'id'=>$orderdetail['id']
+];
+
+
+
+        \Mail::to('TheWayShop@gmail.com')->send(new \App\Mail\OrderDetailMail($details,$orderdetail));
+Session::forget('order_id');
+Session::forget('grand_total');
+Session::forget('countcartproduct');
+
+            return redirect()->back()->with('flash_message_success','Your Payment Successfully Done!'."<br>".'Check Your Email For Details');
         }
     }
 

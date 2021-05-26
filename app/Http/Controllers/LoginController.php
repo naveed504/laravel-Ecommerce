@@ -29,7 +29,7 @@ class LoginController extends Controller
     {
         Auth::logout();
         Alert::success('Success', 'User Loged Out ');
-        return redirect()->back();
+        return redirect('/');
 
     }
 
