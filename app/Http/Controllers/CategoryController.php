@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use RealRashid\SweetAlert\Facades\Alert;
 
-
 class CategoryController extends Controller
 {
     public function addcategoryform()
