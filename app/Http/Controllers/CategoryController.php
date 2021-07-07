@@ -35,16 +35,16 @@ class CategoryController extends Controller
             return redirect()->back()->with('alert-danger', $e->getMessage());
         }
     }
+    
     public function editcategory($id)
     {
         $categoryDetails=Category::find($id);
         $levels=Category::all();
         return view('admin.category.edit_category',compact('categoryDetails','levels'));
-
     }
+    
     public function updatecategory(Request $request, $id)
     {
-
         $upcat= Category::find($id);
         $upcat->name =$request->category_name;
         $upcat->parent_id =$request->parent_id;
@@ -52,22 +52,16 @@ class CategoryController extends Controller
         $upcat->description =$request->category_description;
         $upcat->save();
         return redirect()->back();
-
     }
-
     public function deletecategory($id)
     {
         $result=Category::find($id);
         $result->delete();
         Alert::success('Deleted Successfully', 'Record Delete Successfully');
         return redirect()->back();
-
-
     }
-
     public function categoriesstatus(Request $request)
     {
         Category::where('id',$request->id)->update(['status' => $request->status]);
-
     }
 }
