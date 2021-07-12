@@ -34,15 +34,13 @@ class CategoryController extends Controller
         }catch(\Exception $e){
             return redirect()->back()->with('alert-danger', $e->getMessage());
         }
-    }
-    
+    }    
     public function editcategory($id)
     {
         $categoryDetails=Category::find($id);
         $levels=Category::all();
         return view('admin.category.edit_category',compact('categoryDetails','levels'));
-    }
-    
+    }    
     public function updatecategory(Request $request, $id)
     {
         $upcat= Category::find($id);
